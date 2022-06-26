@@ -1,7 +1,20 @@
 # MischiefEnchantTiers
 
-Part of the MischiefSMP plugin suite.
+This plugin allows you to set a multiplier for your enchantments depending on the floor the crafting table is resting on.
 
+Edit the values in the config.yml file, they look like this:
+
+```
+tiers:
+  NETHERITE_BLOCK: 5
+  DIAMOND_BLOCK: 4
+  GOLD_BLOCK: 3
+  IRON_BLOCK: 2
+  ```
+
+The number is the level, every enchantment you get is multiplied by that value.
+
+Feedback/issues greatly apprechiated!
 
 License
 ----
