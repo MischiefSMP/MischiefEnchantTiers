@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+}
+
+group 'com.mischiefsmp'
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    maven { url = 'https://jitpack.io' }
+
+    mavenLocal()
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
+    implementation 'org.json:json:20220320'
+
+    //Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    //https://stackoverflow.com/a/52818011/9179831
+
+    from {
+        configurations
+                .runtimeClasspath
+                .findAll { !it.name.endsWith('pom') }
+                .collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
