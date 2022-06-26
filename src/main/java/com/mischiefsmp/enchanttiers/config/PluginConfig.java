@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Getter
 public class PluginConfig extends ConfigFile {
@@ -16,6 +17,9 @@ public class PluginConfig extends ConfigFile {
 
     @ConfigValue(path = "languages")
     private ArrayList<String> languages;
+
+    @ConfigValue(path = "tiers")
+    private HashMap<String, Integer> tiers;
 
     public PluginConfig(Plugin plugin) {
         super(plugin, "config.yml", "config.yml");

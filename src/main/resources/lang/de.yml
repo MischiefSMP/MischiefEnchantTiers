@@ -1,1 +1,2 @@
 place-success: "Enchant tier aktiviert! Du kriegst x%s auf deine Verzauberungen!"
+place-failure: "Block %s unter Verzauberungs Tisch gefunden! Du brauchst ein 3x3 Feld unter dem Tisch!"

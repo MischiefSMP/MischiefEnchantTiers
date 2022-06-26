@@ -2,3 +2,7 @@ language: "en"
 languages:
   - "en"
   - "de"
+
+tiers:
+  GOLD_BLOCK: 2
+  IRON_BLOCK: 2
