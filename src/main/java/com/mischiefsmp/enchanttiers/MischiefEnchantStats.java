@@ -4,8 +4,6 @@ import com.mischiefsmp.core.LangManager;
 import com.mischiefsmp.enchanttiers.config.PluginConfig;
 import com.mischiefsmp.enchanttiers.events.Events;
 import lombok.Getter;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -46,7 +44,7 @@ public class MischiefEnchantStats extends JavaPlugin {
         pluginConfig = new PluginConfig(this);
         langManager = new LangManager(this, pluginConfig.getLanguages(), pluginConfig.getDefaultLanguage());
 
-        getServer().getPluginManager().registerEvents(new Events(this), this);
+        getServer().getPluginManager().registerEvents(new Events(), this);
     }
 
     @Override

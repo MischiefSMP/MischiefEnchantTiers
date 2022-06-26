@@ -2,23 +2,17 @@ package com.mischiefsmp.enchanttiers.events;
 
 import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
 import com.mischiefsmp.enchanttiers.Utils;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-
-import java.util.Locale;
+import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 
 public class Events implements Listener {
-    private MischiefEnchantStats plugin;
-
-    public Events(MischiefEnchantStats plugin) {
-        this.plugin = plugin;
-    }
-
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() == Material.ENCHANTING_TABLE) {
@@ -31,7 +25,29 @@ public class Events implements Listener {
             } else {
                 MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-failure", blockId);
             }
+        }
+    }
 
+    @EventHandler
+    public void onPreEnchant(PrepareItemEnchantEvent event) {
+        if(!Utils.isValidTierPlacement(event.getEnchantBlock())) return;
+
+        Block b = event.getEnchantBlock().getWorld().getBlockAt(event.getEnchantBlock().getLocation().subtract(0, 1 , 0));
+        for(EnchantmentOffer offer : event.getOffers()) {
+            offer.setEnchantmentLevel(offer.getEnchantmentLevel() * MischiefEnchantStats.getPluginConfig().getTiers().get(b.getType().toString()));
+        }
+    }
+
+    @EventHandler
+    public void onEnchant(EnchantItemEvent event) {
+        if(!Utils.isValidTierPlacement(event.getEnchantBlock())) return;
+
+        Block b = event.getEnchantBlock().getWorld().getBlockAt(event.getEnchantBlock().getLocation().subtract(0, 1 , 0));
+        int tierMulti = MischiefEnchantStats.getPluginConfig().getTiers().get(b.getType().toString());
+
+        for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
+            int newLevel = event.getEnchantsToAdd().get(enchantment) * tierMulti;
+            event.getEnchantsToAdd().put(enchantment, newLevel);
         }
     }
 }

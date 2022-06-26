@@ -4,5 +4,7 @@ languages:
   - "de"
 
 tiers:
-  GOLD_BLOCK: 2
+  NETHERITE_BLOCK: 5
+  DIAMOND_BLOCK: 4
+  GOLD_BLOCK: 3
   IRON_BLOCK: 2
