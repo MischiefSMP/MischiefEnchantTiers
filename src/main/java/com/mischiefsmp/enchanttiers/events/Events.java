@@ -1,6 +1,7 @@
 package com.mischiefsmp.enchanttiers.events;
 
 import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
+import com.mischiefsmp.enchanttiers.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,23 +22,10 @@ public class Events implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() == Material.ENCHANTING_TABLE) {
-            Location loc = event.getBlock().getLocation().subtract(0, 1, 0);
-            String blockId = event.getBlock().getWorld().getBlockAt(loc).getType().toString();
-
+            final String blockId = event.getBlock().getWorld().getBlockAt(event.getBlock().getLocation().subtract(0, 1, 0)).getType().toString();
             if(!MischiefEnchantStats.getPluginConfig().getTiers().containsKey(blockId)) return;
 
-            boolean works = true;
-            for(int z = -1; z < 2; z++) {
-                for(int x = -1; x < 2; x++) {
-                    Block b = event.getBlock().getWorld().getBlockAt(loc.getBlockX() + x, loc.getBlockY(), loc.getBlockZ() + z);
-                    if(b.getType() != Material.getMaterial(blockId)) {
-                        works = false;
-                        break;
-                    }
-                }
-            }
-
-            if(works) {
+            if(Utils.isValidTierPlacement(event.getBlock())) {
                 int tier = MischiefEnchantStats.getPluginConfig().getTiers().get(blockId);
                 MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-success", tier);
             } else {
