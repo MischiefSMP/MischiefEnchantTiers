@@ -4,7 +4,3 @@ author: sven@wollinger.email
 main: com.mischiefsmp.enchanttiers.MischiefEnchantStats
 api-version: 1.18
 softdepend: ["MischiefCore"]
-commands:
-  stats:
-    description: View stats
-    usage: /<command>
