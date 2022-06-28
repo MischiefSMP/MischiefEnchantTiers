@@ -4,7 +4,6 @@ import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
 import com.mischiefsmp.enchanttiers.TierPlacementResult;
 import com.mischiefsmp.enchanttiers.Utils;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.event.EventHandler;
