@@ -1,6 +1,7 @@
 package com.mischiefsmp.enchanttiers.events;
 
 import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
+import com.mischiefsmp.enchanttiers.TierPlacementResult;
 import com.mischiefsmp.enchanttiers.Utils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,37 +17,30 @@ public class Events implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() == Material.ENCHANTING_TABLE) {
-            final String blockId = event.getBlock().getWorld().getBlockAt(event.getBlock().getLocation().subtract(0, 1, 0)).getType().toString();
-            if(!MischiefEnchantStats.getPluginConfig().getTiers().containsKey(blockId)) return;
-
-            if(Utils.isValidTierPlacement(event.getBlock())) {
-                int tier = MischiefEnchantStats.getPluginConfig().getTiers().get(blockId);
-                MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-success", tier);
-            } else {
-                MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-failure", blockId);
-            }
+            TierPlacementResult result = Utils.isValidTierPlacement(event.getBlock());
+            if(result.success())
+                MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-success", result.tier());
+            else if(result.isOnTierBlock())
+                MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-failure", result.blockPrettyPrint());
         }
     }
 
     @EventHandler
     public void onPreEnchant(PrepareItemEnchantEvent event) {
-        if(!Utils.isValidTierPlacement(event.getEnchantBlock())) return;
+        TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
+        if(!result.success()) return;
 
-        Block b = event.getEnchantBlock().getWorld().getBlockAt(event.getEnchantBlock().getLocation().subtract(0, 1 , 0));
-        for(EnchantmentOffer offer : event.getOffers()) {
-            offer.setEnchantmentLevel(offer.getEnchantmentLevel() * MischiefEnchantStats.getPluginConfig().getTiers().get(b.getType().toString()));
-        }
+        for(EnchantmentOffer offer : event.getOffers())
+            offer.setEnchantmentLevel(offer.getEnchantmentLevel() * result.tier());
     }
 
     @EventHandler
     public void onEnchant(EnchantItemEvent event) {
-        if(!Utils.isValidTierPlacement(event.getEnchantBlock())) return;
-
-        Block b = event.getEnchantBlock().getWorld().getBlockAt(event.getEnchantBlock().getLocation().subtract(0, 1 , 0));
-        int tierMulti = MischiefEnchantStats.getPluginConfig().getTiers().get(b.getType().toString());
+        TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
+        if(!result.success()) return;
 
         for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
-            int newLevel = event.getEnchantsToAdd().get(enchantment) * tierMulti;
+            int newLevel = event.getEnchantsToAdd().get(enchantment) * result.tier();
             event.getEnchantsToAdd().put(enchantment, newLevel);
         }
     }
