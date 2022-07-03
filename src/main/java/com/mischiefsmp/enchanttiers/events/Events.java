@@ -32,8 +32,10 @@ public class Events implements Listener {
         TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
         if(!result.success()) return;
 
-        for(EnchantmentOffer offer : event.getOffers())
-            offer.setEnchantmentLevel(offer.getEnchantmentLevel() * result.tier());
+        for(EnchantmentOffer offer : event.getOffers()) {
+            if(offer != null)
+                offer.setEnchantmentLevel(offer.getEnchantmentLevel() * result.tier());
+        }
     }
 
     @EventHandler
