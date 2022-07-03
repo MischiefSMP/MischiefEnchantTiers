@@ -15,7 +15,8 @@ import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 public class Events implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(event.getBlock().getType() == Material.ENCHANTING_TABLE) {
+        Material t = event.getBlock().getType();
+        if(t == Material.ENCHANTING_TABLE || t == Material.ANVIL) {
             TierPlacementResult result = Utils.isValidTierPlacement(event.getBlock());
             if(result.success())
                 MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-success", result.tier());
