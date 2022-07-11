@@ -5,6 +5,7 @@ languages:
 
 show-title: true
 title-seconds: 2
+spawn-firework: true
 
 tiers:
   NETHERITE_BLOCK: 5

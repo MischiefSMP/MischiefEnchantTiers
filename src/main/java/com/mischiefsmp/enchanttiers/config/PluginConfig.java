@@ -24,6 +24,9 @@ public class PluginConfig extends ConfigFile {
     @ConfigValue(path = "title-seconds")
     private int titleSeconds;
 
+    @ConfigValue(path = "spawn-firework")
+    private boolean spawnFirework;
+
     @ConfigValue(path = "tiers")
     private HashMap<String, Integer> tiers;
 
