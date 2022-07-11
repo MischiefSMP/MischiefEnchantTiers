@@ -9,6 +9,7 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.EntityType;
@@ -72,18 +73,24 @@ public class Events implements Listener {
         TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
         if(!result.success()) return;
 
-        if(cfg.runChance(event.getEnchantBlock().getRelative(0, -1, 0))) {
+        Block eTable = event.getEnchantBlock();
+
+        if(cfg.runChance(eTable.getRelative(0, -1, 0))) {
             //Success
             if(cfg.isSpawnFirework())
-                Utils.spawnFirework(event.getEnchantBlock().getLocation().add(0, 1, 0));
+                Utils.spawnFirework(eTable.getLocation().add(0, 1, 0));
 
             for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
                 int newLevel = event.getEnchantsToAdd().get(enchantment) * result.tier();
                 event.getEnchantsToAdd().put(enchantment, newLevel);
             }
         } else {
+            event.getEnchanter().getInventory().remove(event.getItem());
             event.setCancelled(true);
-            event.getEnchantBlock().setType(Material.AIR);
+            eTable.getWorld().spawnEntity(event.getEnchantBlock().getLocation(), EntityType.LIGHTNING);
+            Utils.breakBlock(event.getEnchantBlock());
+            for(Block b : Utils.getTierAreaBlocks(event.getEnchantBlock()))
+                Utils.breakBlock(b);
         }
     }
 
