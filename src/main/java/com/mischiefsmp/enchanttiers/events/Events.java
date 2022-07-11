@@ -5,15 +5,14 @@ import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
 import com.mischiefsmp.enchanttiers.TierPlacementResult;
 import com.mischiefsmp.enchanttiers.Utils;
 import com.mischiefsmp.enchanttiers.config.PluginConfig;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -22,7 +21,6 @@ import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
 
 public class Events implements Listener {
     private final LangManager lm;
@@ -74,6 +72,7 @@ public class Events implements Listener {
         if(!result.success()) return;
 
         Block eTable = event.getEnchantBlock();
+        Player player = event.getEnchanter();
 
         if(cfg.runChance(eTable.getRelative(0, -1, 0))) {
             //Success
@@ -85,12 +84,18 @@ public class Events implements Listener {
                 event.getEnchantsToAdd().put(enchantment, newLevel);
             }
         } else {
-            event.getEnchanter().getInventory().remove(event.getItem());
             event.setCancelled(true);
-            eTable.getWorld().spawnEntity(event.getEnchantBlock().getLocation(), EntityType.LIGHTNING);
-            Utils.breakBlock(event.getEnchantBlock());
-            for(Block b : Utils.getTierAreaBlocks(event.getEnchantBlock()))
-                Utils.breakBlock(b);
+            event.getInventory().remove(event.getItem());
+            player.playSound(eTable.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+            player.playSound(eTable.getLocation(), Sound.ENTITY_TNT_PRIMED, 1, 1);
+
+            Bukkit.getScheduler ().runTaskLater (MischiefEnchantStats.getInstance(), () -> {
+                eTable.getWorld().spawnEntity(eTable.getLocation(), EntityType.LIGHTNING);
+                Utils.breakBlock(eTable);
+                for(Block b : Utils.getTierAreaBlocks(eTable))
+                    Utils.breakBlock(b);
+                eTable.getWorld().createExplosion(eTable.getLocation(), cfg.getExplodePower(), false, false);
+            }, 15);
         }
     }
 
@@ -120,7 +125,7 @@ public class Events implements Listener {
                             resultItem.addUnsafeEnchantment(e, firstLevel);
                         }
                     } else {
-                        //Doesnt have it yet, just add it.
+                        //Doesn't have it yet, just add it.
                         resultItem.addUnsafeEnchantment(e, eLevel);
                     }
                 }

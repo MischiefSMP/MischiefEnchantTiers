@@ -38,6 +38,9 @@ public class PluginConfig extends ConfigFile {
     @ConfigValue(path = "fail-chances")
     private HashMap<String, Integer> failChances;
 
+    @ConfigValue(path = "explode-power")
+    private int explodePower;
+
     @ConfigValue(path = "tiers")
     private HashMap<String, Integer> tiers;
 

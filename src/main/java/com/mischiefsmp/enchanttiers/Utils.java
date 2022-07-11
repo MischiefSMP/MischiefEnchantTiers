@@ -5,15 +5,13 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.Item;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
-    private static PluginConfig cfg = MischiefEnchantStats.getPluginConfig();
+    private static final PluginConfig cfg = MischiefEnchantStats.getPluginConfig();
 
     public static TierPlacementResult isValidTierPlacement(Block eTable) {
         Location loc = eTable.getLocation().subtract(0, 1, 0);

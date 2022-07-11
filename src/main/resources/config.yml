@@ -19,6 +19,8 @@ fail-chances:
   #DIAMOND_BLOCK: 50
   #GOLD_BLOCK: 25
 
+explode-power: 3
+
 # Tiers - Uncomment for examples
 tiers:
   #NETHERITE_BLOCK: 5
