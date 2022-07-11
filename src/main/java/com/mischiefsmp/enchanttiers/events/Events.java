@@ -5,14 +5,14 @@ import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
 import com.mischiefsmp.enchanttiers.TierPlacementResult;
 import com.mischiefsmp.enchanttiers.Utils;
 import com.mischiefsmp.enchanttiers.config.PluginConfig;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -21,7 +21,6 @@ import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
 
 public class Events implements Listener {
     private final LangManager lm;
@@ -36,21 +35,17 @@ public class Events implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() == Material.ENCHANTING_TABLE) {
             TierPlacementResult result = Utils.isValidTierPlacement(event.getBlock());
+
             if(!result.success()) {
-                lm.sendString(event.getPlayer(), "place-failure", result.blockPrettyPrint());
+                if(result.isOnTierBlock())
+                    lm.sendString(event.getPlayer(), "place-failure", result.blockPrettyPrint());
                 return;
             }
 
             lm.sendString(event.getPlayer(), "place-success", result.tier());
 
-            if(cfg.isSpawnFirework()) {
-                Location loc = event.getBlock().getLocation().add(0, 1, 0);
-                Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-                FireworkMeta fwm = fw.getFireworkMeta();
-                fwm.setPower(2);
-                fwm.addEffect(FireworkEffect.builder().withColor(Color.GREEN).with(FireworkEffect.Type.CREEPER).build());
-                fw.setFireworkMeta(fwm);
-            }
+            if(cfg.isSpawnFirework())
+                Utils.spawnFirework(event.getBlock().getLocation().add(0, 1, 0));
 
             if(cfg.isShowTitle()) {
                 String l1 = lm.getString(event.getPlayer(), "tier-title-line1");
@@ -76,9 +71,31 @@ public class Events implements Listener {
         TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
         if(!result.success()) return;
 
-        for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
-            int newLevel = event.getEnchantsToAdd().get(enchantment) * result.tier();
-            event.getEnchantsToAdd().put(enchantment, newLevel);
+        Block eTable = event.getEnchantBlock();
+        Player player = event.getEnchanter();
+
+        if(cfg.runChance(eTable.getRelative(0, -1, 0))) {
+            //Success
+            if(cfg.isSpawnFirework())
+                Utils.spawnFirework(eTable.getLocation().add(0, 1, 0));
+
+            for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
+                int newLevel = event.getEnchantsToAdd().get(enchantment) * result.tier();
+                event.getEnchantsToAdd().put(enchantment, newLevel);
+            }
+        } else {
+            event.setCancelled(true);
+            event.getInventory().remove(event.getItem());
+            player.playSound(eTable.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+            player.playSound(eTable.getLocation(), Sound.ENTITY_TNT_PRIMED, 1, 1);
+
+            Bukkit.getScheduler ().runTaskLater (MischiefEnchantStats.getInstance(), () -> {
+                eTable.getWorld().spawnEntity(eTable.getLocation(), EntityType.LIGHTNING);
+                Utils.breakBlock(eTable);
+                for(Block b : Utils.getTierAreaBlocks(eTable))
+                    Utils.breakBlock(b);
+                eTable.getWorld().createExplosion(eTable.getLocation(), cfg.getExplodePower(), false, false);
+            }, 15);
         }
     }
 
@@ -108,7 +125,7 @@ public class Events implements Listener {
                             resultItem.addUnsafeEnchantment(e, firstLevel);
                         }
                     } else {
-                        //Doesnt have it yet, just add it.
+                        //Doesn't have it yet, just add it.
                         resultItem.addUnsafeEnchantment(e, eLevel);
                     }
                 }
