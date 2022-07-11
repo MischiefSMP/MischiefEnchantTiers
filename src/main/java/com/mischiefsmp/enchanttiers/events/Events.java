@@ -1,30 +1,66 @@
 package com.mischiefsmp.enchanttiers.events;
 
+import com.mischiefsmp.core.LangManager;
 import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
 import com.mischiefsmp.enchanttiers.TierPlacementResult;
 import com.mischiefsmp.enchanttiers.Utils;
-import org.bukkit.Material;
+import com.mischiefsmp.enchanttiers.config.PluginConfig;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
 
 public class Events implements Listener {
+    private LangManager lm;
+    private PluginConfig cfg;
+
+    public Events() {
+        lm = MischiefEnchantStats.getLangManager();
+        cfg = MischiefEnchantStats.getPluginConfig();
+    }
+
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() == Material.ENCHANTING_TABLE) {
             TierPlacementResult result = Utils.isValidTierPlacement(event.getBlock());
-            if(result.success())
-                MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-success", result.tier());
-            else if(result.isOnTierBlock())
-                MischiefEnchantStats.getLangManager().sendString(event.getPlayer(), "place-failure", result.blockPrettyPrint());
+            if(!result.success()) {
+                lm.sendString(event.getPlayer(), "place-failure", result.blockPrettyPrint());
+                return;
+            }
+
+            lm.sendString(event.getPlayer(), "place-success", result.tier());
+            Location loc = event.getBlock().getLocation().add(0, 1, 0);
+
+            Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+            FireworkMeta fwm = fw.getFireworkMeta();
+            fwm.setPower(2);
+            fwm.addEffect(FireworkEffect.builder().withColor(Color.GREEN).with(FireworkEffect.Type.CREEPER).build());
+            fw.setFireworkMeta(fwm);
+
+            if(cfg.isShowTitle()) {
+                String l1 = lm.getString(event.getPlayer(), "tier-title-line1");
+                String l2 = lm.getString(event.getPlayer(), "tier-title-line2", result.tier() + "");
+                event.getPlayer().sendTitle(l1, l2, 0, cfg.getTitleSeconds() * 20, 0);
+            }
+
+            event.getBlock().getWorld().playEffect(loc, Effect.ELECTRIC_SPARK, null);
         }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+
     }
 
     @EventHandler

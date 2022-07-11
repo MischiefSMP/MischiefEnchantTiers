@@ -18,6 +18,12 @@ public class PluginConfig extends ConfigFile {
     @ConfigValue(path = "languages")
     private ArrayList<String> languages;
 
+    @ConfigValue(path = "show-title")
+    private boolean showTitle;
+
+    @ConfigValue(path = "title-seconds")
+    private int titleSeconds;
+
     @ConfigValue(path = "tiers")
     private HashMap<String, Integer> tiers;
 

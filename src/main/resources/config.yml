@@ -3,6 +3,9 @@ languages:
   - "en"
   - "de"
 
+show-title: true
+title-seconds: 2
+
 tiers:
   NETHERITE_BLOCK: 5
   DIAMOND_BLOCK: 4
