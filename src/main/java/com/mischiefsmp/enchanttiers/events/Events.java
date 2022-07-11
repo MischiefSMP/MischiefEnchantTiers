@@ -87,7 +87,33 @@ public class Events implements Listener {
         ItemStack first = event.getInventory().getItem(0);
         ItemStack second = event.getInventory().getItem(1);
 
-        if(event.getResult() != null && first != null && second != null && first.getType() == Material.ENCHANTED_BOOK && second.getType() == Material.ENCHANTED_BOOK) {
+        //Both items are books
+        if(first != null && first.getType() != Material.ENCHANTED_BOOK && second != null && second.getType() == Material.ENCHANTED_BOOK) {
+            ItemStack resultItem = event.getResult();
+
+            EnchantmentStorageMeta bookEnchantments = (EnchantmentStorageMeta) second.getItemMeta();
+            if(bookEnchantments == null || resultItem == null)
+                return;
+
+            for(Enchantment e : bookEnchantments.getStoredEnchants().keySet()) {
+                int eLevel = bookEnchantments.getStoredEnchants().get(e);
+                if(e.canEnchantItem(first)) {
+                    if(first.containsEnchantment(e)) {
+                        int firstLevel = first.getEnchantmentLevel(e);
+                        if(eLevel >= firstLevel) {
+                            //Upgrade. Lets go!
+                            resultItem.addUnsafeEnchantment(e, eLevel + 1);
+                        } else {
+                            //Make sure mc doesnt just cap it
+                            resultItem.addUnsafeEnchantment(e, firstLevel);
+                        }
+                    } else {
+                        //Doesnt have it yet, just add it.
+                        resultItem.addUnsafeEnchantment(e, eLevel);
+                    }
+                }
+            }
+        } else if(event.getResult() != null && first != null && second != null && first.getType() == Material.ENCHANTED_BOOK && second.getType() == Material.ENCHANTED_BOOK) {
             EnchantmentStorageMeta firstMeta = (EnchantmentStorageMeta) first.getItemMeta();
             EnchantmentStorageMeta secondMeta = (EnchantmentStorageMeta) second.getItemMeta();
             EnchantmentStorageMeta resultMeta = (EnchantmentStorageMeta) event.getResult().getItemMeta();
