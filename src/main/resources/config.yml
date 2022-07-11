@@ -3,21 +3,25 @@ languages:
   - "en"
   - "de"
 
+#Extra effects
 show-title: true
 title-seconds: 2
 spawn-firework: true
+
 # prevent = Prevents people from breaking tier blocks while another user is using them
 # close = Closes the other users enchant interface when block is broken
 protect-mode: prevent
 
+# Fail chances - Uncomment for examples
 # Percentage, for example, 75 means that 75% of the time the enchantment process will fail
 fail-chances:
-  NETHERITE_BLOCK: 75
-  DIAMOND_BLOCK: 50
-  GOLD_BLOCK: 25
+  #NETHERITE_BLOCK: 75
+  #DIAMOND_BLOCK: 50
+  #GOLD_BLOCK: 25
 
+# Tiers - Uncomment for examples
 tiers:
-  NETHERITE_BLOCK: 5
-  DIAMOND_BLOCK: 4
-  GOLD_BLOCK: 3
-  IRON_BLOCK: 2
+  #NETHERITE_BLOCK: 5
+  #DIAMOND_BLOCK: 4
+  #GOLD_BLOCK: 3
+  #IRON_BLOCK: 2
