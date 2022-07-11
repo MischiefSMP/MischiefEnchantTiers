@@ -66,34 +66,6 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onPistonExtend(BlockPistonExtendEvent event) {
-        for(Block b : event.getBlocks()) {
-            if(OpenTableStorage.isActiveTierBlock(b)) {
-                cfg.runProtect(b, event);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPistonRetract(BlockPistonRetractEvent event) {
-        for(Block b : event.getBlocks()) {
-            if(OpenTableStorage.isActiveTierBlock(b)) {
-                cfg.runProtect(b, event);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-        Block b = event.getBlock();
-        if (cfg.isTierBlock(b)) {
-            if(OpenTableStorage.isActiveTierBlock(b)) {
-                cfg.runProtect(b, event);
-            }
-        }
-    }
-
-    @EventHandler
     public void onPreEnchant(PrepareItemEnchantEvent event) {
         TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
         if(!result.success()) return;
@@ -112,22 +84,6 @@ public class Events implements Listener {
         for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
             int newLevel = event.getEnchantsToAdd().get(enchantment) * result.tier();
             event.getEnchantsToAdd().put(enchantment, newLevel);
-        }
-    }
-
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        OpenTableStorage.removeOpenInventory((Player)event.getPlayer());
-    }
-
-    @EventHandler
-    public void onInventoryOpen(InventoryOpenEvent event) {
-        Location loc = event.getInventory().getLocation();
-        if(loc != null && loc.getBlock().getType() == Material.ENCHANTING_TABLE) {
-            Block block = loc.getBlock();
-            if(Utils.isValidTierPlacement(block).success()) {
-                OpenTableStorage.addOpenInventory(block, (Player)event.getPlayer());
-            }
         }
     }
 
