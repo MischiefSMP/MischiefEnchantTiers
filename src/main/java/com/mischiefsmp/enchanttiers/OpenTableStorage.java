@@ -24,10 +24,9 @@ public class OpenTableStorage {
         if(!MischiefEnchantStats.getPluginConfig().isTierBlock(tierBlock))
             return false;
 
-        for(UUID uuid : openTables.keySet()) {
+        for(UUID uuid : openTables.keySet())
              if(isLocationUnderEnchantTable(tierBlock.getLocation(), openTables.get(uuid)))
                  return true;
-        }
 
         return false;
     }
@@ -50,10 +49,10 @@ public class OpenTableStorage {
         return false;
     }
 
-    private static boolean isLocationUnderEnchantTable(final Location lookingFor, Location enchantTable) {
+    private static boolean isLocationUnderEnchantTable(final Location lookingFor, Location eTable) {
         for(int z = -1; z < 2; z++) {
             for(int x = -1; x < 2; x++) {
-                Location toCheck = new Location(enchantTable.getWorld(), enchantTable.getBlockX() + x, enchantTable.getBlockY() - 1, enchantTable.getBlockZ() + z);
+                Location toCheck = new Location(eTable.getWorld(), eTable.getBlockX() + x, eTable.getBlockY() - 1, eTable.getBlockZ() + z);
                 if(lookingFor.equals(toCheck))
                     return true;
             }
