@@ -2,20 +2,27 @@ package com.mischiefsmp.enchanttiers.events;
 
 import com.mischiefsmp.core.LangManager;
 import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
+import com.mischiefsmp.enchanttiers.OpenTableStorage;
 import com.mischiefsmp.enchanttiers.TierPlacementResult;
 import com.mischiefsmp.enchanttiers.Utils;
 import com.mischiefsmp.enchanttiers.config.PluginConfig;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -59,8 +66,31 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        for(Block b : event.getBlocks()) {
+            if(OpenTableStorage.isActiveTierBlock(b)) {
+                cfg.runProtect(b, event);
+            }
+        }
+    }
 
+    @EventHandler
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        for(Block b : event.getBlocks()) {
+            if(OpenTableStorage.isActiveTierBlock(b)) {
+                cfg.runProtect(b, event);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block b = event.getBlock();
+        if (cfg.isTierBlock(b)) {
+            if(OpenTableStorage.isActiveTierBlock(b)) {
+                cfg.runProtect(b, event);
+            }
+        }
     }
 
     @EventHandler
@@ -86,6 +116,22 @@ public class Events implements Listener {
     }
 
     @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        OpenTableStorage.removeOpenInventory((Player)event.getPlayer());
+    }
+
+    @EventHandler
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        Location loc = event.getInventory().getLocation();
+        if(loc != null && loc.getBlock().getType() == Material.ENCHANTING_TABLE) {
+            Block block = loc.getBlock();
+            if(Utils.isValidTierPlacement(block).success()) {
+                OpenTableStorage.addOpenInventory(block, (Player)event.getPlayer());
+            }
+        }
+    }
+
+    @EventHandler
     public void onPreAnvil(PrepareAnvilEvent event) {
         ItemStack first = event.getInventory().getItem(0);
         ItemStack second = event.getInventory().getItem(1);
@@ -100,7 +146,7 @@ public class Events implements Listener {
             for(Enchantment key : secondMeta.getStoredEnchants().keySet()) {
                 int storedLevel = secondMeta.getStoredEnchants().get(key);
                 if(!firstMeta.hasStoredEnchant(key)) {
-                    //Enchantment doesnt exist in book yet, just add it as is
+                    //Enchantment doesn't exist in book yet, just add it as is
                     resultMeta.addStoredEnchant(key, storedLevel, true);
                 } else {
                     //Enchantment exists, allow upgrading it if the stored level is higher or equal to the one currently applied

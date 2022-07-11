@@ -22,4 +22,8 @@ public class Utils {
         }
         return new TierPlacementResult(true, true, blockId, pp, MischiefEnchantStats.getPluginConfig().getTiers().get(blockId));
     }
+
+    public static String printLocation(Location loc) {
+        return String.format("(%s, %s, %s, %s)", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName());
+    }
 }
