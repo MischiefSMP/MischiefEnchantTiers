@@ -59,12 +59,9 @@ public class OpenTableStorage {
     }
 
     private static boolean isLocationUnderEnchantTable(Location lookingFor, Location eTable) {
-        for(int z = -1; z < 2; z++) {
-            for(int x = -1; x < 2; x++) {
-                Location toCheck = new Location(eTable.getWorld(), eTable.getBlockX() + x, eTable.getBlockY() - 1, eTable.getBlockZ() + z);
-                if(lookingFor.equals(toCheck))
-                    return true;
-            }
+        for(Block b : Utils.getTierAreaBlocks(eTable.getBlock())) {
+            if(lookingFor.equals(b.getLocation()))
+                return true;
         }
         return false;
     }

@@ -36,21 +36,17 @@ public class Events implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() == Material.ENCHANTING_TABLE) {
             TierPlacementResult result = Utils.isValidTierPlacement(event.getBlock());
+
             if(!result.success()) {
-                lm.sendString(event.getPlayer(), "place-failure", result.blockPrettyPrint());
+                if(result.isOnTierBlock())
+                    lm.sendString(event.getPlayer(), "place-failure", result.blockPrettyPrint());
                 return;
             }
 
             lm.sendString(event.getPlayer(), "place-success", result.tier());
 
-            if(cfg.isSpawnFirework()) {
-                Location loc = event.getBlock().getLocation().add(0, 1, 0);
-                Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-                FireworkMeta fwm = fw.getFireworkMeta();
-                fwm.setPower(2);
-                fwm.addEffect(FireworkEffect.builder().withColor(Color.GREEN).with(FireworkEffect.Type.CREEPER).build());
-                fw.setFireworkMeta(fwm);
-            }
+            if(cfg.isSpawnFirework())
+                Utils.spawnFirework(event.getBlock().getLocation().add(0, 1, 0));
 
             if(cfg.isShowTitle()) {
                 String l1 = lm.getString(event.getPlayer(), "tier-title-line1");
@@ -76,9 +72,18 @@ public class Events implements Listener {
         TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
         if(!result.success()) return;
 
-        for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
-            int newLevel = event.getEnchantsToAdd().get(enchantment) * result.tier();
-            event.getEnchantsToAdd().put(enchantment, newLevel);
+        if(cfg.runChance(event.getEnchantBlock().getRelative(0, -1, 0))) {
+            //Success
+            if(cfg.isSpawnFirework())
+                Utils.spawnFirework(event.getEnchantBlock().getLocation().add(0, 1, 0));
+
+            for(Enchantment enchantment : event.getEnchantsToAdd().keySet()) {
+                int newLevel = event.getEnchantsToAdd().get(enchantment) * result.tier();
+                event.getEnchantsToAdd().put(enchantment, newLevel);
+            }
+        } else {
+            event.setCancelled(true);
+            event.getEnchantBlock().setType(Material.AIR);
         }
     }
 
