@@ -5,14 +5,16 @@ import com.mischiefsmp.enchanttiers.MischiefEnchantStats;
 import com.mischiefsmp.enchanttiers.TierPlacementResult;
 import com.mischiefsmp.enchanttiers.Utils;
 import com.mischiefsmp.enchanttiers.config.PluginConfig;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
@@ -59,11 +61,6 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-
-    }
-
-    @EventHandler
     public void onPreEnchant(PrepareItemEnchantEvent event) {
         TierPlacementResult result = Utils.isValidTierPlacement(event.getEnchantBlock());
         if(!result.success()) return;
@@ -100,7 +97,7 @@ public class Events implements Listener {
             for(Enchantment key : secondMeta.getStoredEnchants().keySet()) {
                 int storedLevel = secondMeta.getStoredEnchants().get(key);
                 if(!firstMeta.hasStoredEnchant(key)) {
-                    //Enchantment doesnt exist in book yet, just add it as is
+                    //Enchantment doesn't exist in book yet, just add it as is
                     resultMeta.addStoredEnchant(key, storedLevel, true);
                 } else {
                     //Enchantment exists, allow upgrading it if the stored level is higher or equal to the one currently applied

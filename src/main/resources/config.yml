@@ -6,6 +6,9 @@ languages:
 show-title: true
 title-seconds: 2
 spawn-firework: true
+# prevent = Prevents people from breaking tier blocks while another user is using them
+# close = Closes the other users enchant interface when block is broken
+protect-mode: prevent
 
 tiers:
   NETHERITE_BLOCK: 5
