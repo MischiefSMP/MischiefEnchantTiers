@@ -10,6 +10,12 @@ spawn-firework: true
 # close = Closes the other users enchant interface when block is broken
 protect-mode: prevent
 
+# Percentage, for example, 75 means that 75% of the time the enchantment process will fail
+fail-chances:
+  NETHERITE_BLOCK: 75
+  DIAMOND_BLOCK: 50
+  GOLD_BLOCK: 25
+
 tiers:
   NETHERITE_BLOCK: 5
   DIAMOND_BLOCK: 4
