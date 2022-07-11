@@ -5,6 +5,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Item;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 
 import java.util.ArrayList;
@@ -25,6 +27,11 @@ public class Utils {
                 return new TierPlacementResult(false, true, blockId, pp, 0);
         }
         return new TierPlacementResult(true, true, blockId, pp, MischiefEnchantStats.getPluginConfig().getTiers().get(blockId));
+    }
+
+    public static void breakBlock(Block b) {
+        b.getWorld().spawnParticle(Particle.BLOCK_DUST, b.getLocation().add(0.5,0.5,0.5), 1, 1, 0.1, 0.1, 0.1, b.getBlockData());
+        b.setType(Material.AIR);
     }
 
     public static void spawnFirework(Location location) {
