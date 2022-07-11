@@ -2,3 +2,4 @@ place-success: "Enchant tier aktiviert! Du kriegst x%s auf deine Verzauberungen!
 place-failure: "Block %s unter Verzauberungs Tisch gefunden! Du brauchst ein 3x3 Feld unter dem Tisch!"
 tier-title-line1: "Level aktiv!"
 tier-title-line2: "%sx auf alle Verzauberungen"
+protect-close: "Jemand hat einen Tier Block unter deinem Verzauberungstisch zerstört!"

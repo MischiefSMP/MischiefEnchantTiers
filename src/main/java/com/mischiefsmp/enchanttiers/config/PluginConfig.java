@@ -53,10 +53,10 @@ public class PluginConfig extends ConfigFile {
         return false;
     }
 
-    public void runProtect(Block b, Cancellable event) {
-        switch(protectMode) {
-            case "prevent": event.setCancelled(true);
-            case "close": OpenTableStorage.closeOpenInventories(b);
+    public void runProtect(Block enchantTable, Cancellable event) {
+        switch (protectMode) {
+            case "prevent" -> event.setCancelled(true);
+            case "close" -> OpenTableStorage.closeOpenInventories(enchantTable);
         }
     }
 }

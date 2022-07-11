@@ -66,7 +66,7 @@ public class ProtectEvents implements Listener {
         for(Block b : blocks) {
             if (cfg.isTierBlock(b)) {
                 if (OpenTableStorage.isActiveTierBlock(b)) {
-                    cfg.runProtect(b, event);
+                    cfg.runProtect(OpenTableStorage.getEnchantTableFromTierBlock(b), event);
                 }
             }
         }

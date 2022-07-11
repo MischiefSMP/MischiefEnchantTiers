@@ -20,6 +20,13 @@ public class OpenTableStorage {
         openTables.remove(player.getUniqueId());
     }
 
+    public static Block getEnchantTableFromTierBlock(Block tierBlock) {
+        for(UUID uuid : openTables.keySet())
+            if(isLocationUnderEnchantTable(tierBlock.getLocation(), openTables.get(uuid)))
+                return openTables.get(uuid).getBlock();
+        return null;
+    }
+
     public static boolean isActiveTierBlock(Block tierBlock) {
         if(!MischiefEnchantStats.getPluginConfig().isTierBlock(tierBlock))
             return false;
@@ -35,8 +42,10 @@ public class OpenTableStorage {
         for(UUID uuid : openTables.keySet()) {
             if(openTables.get(uuid).equals(enchantTable.getLocation())) {
                 Player p = Bukkit.getServer().getPlayer(uuid);
-                if(p != null)
+                if(p != null) {
+                    MischiefEnchantStats.getLangManager().sendString(p, "protect-close");
                     p.closeInventory();
+                }
             }
         }
     }
@@ -49,7 +58,7 @@ public class OpenTableStorage {
         return false;
     }
 
-    private static boolean isLocationUnderEnchantTable(final Location lookingFor, Location eTable) {
+    private static boolean isLocationUnderEnchantTable(Location lookingFor, Location eTable) {
         for(int z = -1; z < 2; z++) {
             for(int x = -1; x < 2; x++) {
                 Location toCheck = new Location(eTable.getWorld(), eTable.getBlockX() + x, eTable.getBlockY() - 1, eTable.getBlockZ() + z);
